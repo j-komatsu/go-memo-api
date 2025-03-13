@@ -24,7 +24,56 @@
 | `PUT` | `/notes/{id}` | メモを更新 |
 | `DELETE` | `/notes/{id}` | メモを削除 |
 
-## 4. データモデル
+## 4. SQLiteのインストールと設定
+### **4.1 SQLiteのインストール**
+#### **Windows**
+1. [SQLite公式サイト](https://www.sqlite.org/download.html) から `sqlite-tools-win32-x86.zip` をダウンロード。
+2. 解凍し、`sqlite3.exe` を `C:\sqlite3` などの任意のフォルダに配置。
+3. 環境変数にパスを追加（オプション）。
+   - `C:\sqlite3` を環境変数 `Path` に追加すると、どこからでも `sqlite3` コマンドが使用可能。
+4. コマンドプロンプトを開き、以下のコマンドでインストール確認。
+   ```sh
+   sqlite3 --version
+   ```
+
+#### **macOS**
+1. Homebrewを使用してインストール。
+   ```sh
+   brew install sqlite
+   ```
+2. インストール確認。
+   ```sh
+   sqlite3 --version
+   ```
+
+#### **Linux (Ubuntu)**
+1. APTを使用してインストール。
+   ```sh
+   sudo apt update
+   sudo apt install sqlite3
+   ```
+2. インストール確認。
+   ```sh
+   sqlite3 --version
+   ```
+
+### **4.2 SQLiteのデータベース作成**
+```sh
+sqlite3 notes.db
+```
+これで`notes.db`というデータベースファイルが作成される。
+
+### **4.3 SQLiteテーブル作成**
+```sql
+CREATE TABLE notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## 5. データモデル
 メモを管理するためのデータモデル。
 
 ```go
@@ -38,7 +87,7 @@ type Note struct {
 }
 ```
 
-## 5. API詳細
+## 6. API詳細
 ### `POST /notes`
 **リクエストボディ:**
 ```json
