@@ -2,7 +2,7 @@
 
 ## 1. プロジェクト概要
 **プロジェクト名:** Go Memo API  
-**目的:** シンプルなメモ管理APIを作成し、CRUD操作を実装することでGoのWeb開発を理解する
+**目的:** シンプルなメモ管理APIを作成し、CRUD操作を実装することでGoのWeb開発を学習する。
 
 ## 2. 技術スタック
 | 項目 | 技術 |
@@ -127,6 +127,39 @@ func InitDB() *gorm.DB {
 }
 ```
 
-## 7. まとめ
+## 7. パッケージ構成
+```
+go-memo-api/
+│── main.go             # アプリケーションのエントリーポイント
+│── go.mod              # Goモジュール管理ファイル
+│── go.sum              # 依存関係のチェックサム
+│
+├── config/
+│   ├── db.go           # データベース初期化
+│
+├── models/
+│   ├── note.go         # Noteモデル（構造体）
+│
+├── routes/
+│   ├── note_routes.go  # APIルーティング
+│
+├── controllers/
+│   ├── note_controller.go # NoteのCRUD処理
+│
+└── database/
+    ├── notes.db        # SQLiteデータベース（初回作成時）
+```
+
+### **パッケージの役割**
+| ディレクトリ | 説明 |
+|-------------|----------------------------|
+| `main.go` | アプリのエントリーポイント |
+| `config/db.go` | データベース接続の設定 |
+| `models/note.go` | Note構造体（GORMの定義） |
+| `routes/note_routes.go` | エンドポイントの定義 |
+| `controllers/note_controller.go` | APIの処理を実装 |
+| `database/notes.db` | SQLiteのデータベースファイル |
+
+## 8. まとめ
 このAPIは、Goの基本的なWeb開発スキルを身につけるために、シンプルながらも実用的な機能を備えています。  
 今後、認証機能や検索機能を追加することでさらに拡張できます。
