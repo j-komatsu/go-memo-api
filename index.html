@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メモアプリ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        button {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .update-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .add-btn {
+            background-color: #007BFF;
+            color: white;
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
+    <script>
+        async function fetchNotes() {
+            try {
+                const response = await fetch("http://localhost:8080/notes");
+                if (!response.ok) throw new Error("Failed to fetch notes");
+                const notes = await response.json();
+                const tableBody = document.getElementById("notesTableBody");
+                tableBody.innerHTML = "";
+
+                notes.forEach(note => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${note.id}</td>
+                        <td>${note.title}</td>
+                        <td>${note.content}</td>
+                        <td>
+                            <button class="update-btn" onclick="updateNote(${note.id}, '${note.title}', '${note.content}')">更新</button>
+                            <button class="delete-btn" onclick="deleteNote(${note.id})">削除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function addNote() {
+            const title = document.getElementById("newTitle").value;
+            const content = document.getElementById("newContent").value;
+            if (!title || !content) return alert("タイトルと内容を入力してください");
+
+            const response = await fetch("http://localhost:8080/notes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, content })
+            });
+
+            if (response.ok) {
+                document.getElementById("newTitle").value = "";
+                document.getElementById("newContent").value = "";
+                fetchNotes();
+            } else {
+                console.error("Failed to add note");
+            }
+        }
+
+        async function deleteNote(id) {
+            if (!confirm("本当に削除しますか？")) return;
+            const response = await fetch(`http://localhost:8080/notes/${id}`, { method: "DELETE" });
+            if (response.ok) fetchNotes();
+        }
+
+        async function updateNote(id, currentTitle, currentContent) {
+            const newTitle = prompt("新しいタイトルを入力してください", currentTitle);
+            const newContent = prompt("新しい内容を入力してください", currentContent);
+            if (!newTitle || !newContent) return;
+
+            const response = await fetch(`http://localhost:8080/notes/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: newTitle, content: newContent })
+            });
+
+            if (response.ok) fetchNotes();
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchNotes);
+    </script>
+</head>
+<body>
+    <h1>メモアプリ</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>タイトル</th>
+                <th>内容</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="notesTableBody"></tbody>
+    </table>
+
+    <h2>新しいメモを追加</h2>
+    <div class="input-group">
+        <input type="text" id="newTitle" placeholder="タイトル">
+        <textarea id="newContent" placeholder="内容"></textarea>
+        <button class="add-btn" onclick="addNote()">追加</button>
+    </div>
+</body>
+</html>
